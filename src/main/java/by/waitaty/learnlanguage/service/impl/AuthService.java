@@ -12,7 +12,6 @@ import by.waitaty.learnlanguage.security.JWTUtils;
 import by.waitaty.learnlanguage.token.Token;
 import by.waitaty.learnlanguage.token.TokenRepository;
 import by.waitaty.learnlanguage.token.TokenType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,22 +21,21 @@ import java.util.HashMap;
 
 @Service
 public class AuthService {
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final TokenRepository tokenRepository;
+    private final JWTUtils jwtUtils;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private TokenRepository tokenRepository;
+    public AuthService(UserRepository userRepository, TokenRepository tokenRepository, JWTUtils jwtUtils, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
+        this.userRepository = userRepository;
+        this.tokenRepository = tokenRepository;
+        this.jwtUtils = jwtUtils;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+    }
 
-    @Autowired
-    private JWTUtils jwtUtils;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    public AuthenticationResponse signup(RegisterRequest registerRequest) {
+    public AuthenticationResponse signUp(RegisterRequest registerRequest) {
         User user = User.builder()
                 .username(registerRequest.getUsername())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))

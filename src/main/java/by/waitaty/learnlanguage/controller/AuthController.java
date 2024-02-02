@@ -5,7 +5,6 @@ import by.waitaty.learnlanguage.dto.request.RefreshTokenRequest;
 import by.waitaty.learnlanguage.dto.request.RegisterRequest;
 import by.waitaty.learnlanguage.dto.response.AuthenticationResponse;
 import by.waitaty.learnlanguage.service.impl.AuthService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,14 +12,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/v1/auth")
 public class AuthController {
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
+
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
 
     @PostMapping("/signup")
-    public ResponseEntity<AuthenticationResponse> signup(@RequestBody RegisterRequest registerRequest) {
-        return ResponseEntity.ok(authService.signup(registerRequest));
+    public ResponseEntity<AuthenticationResponse> signUp(@RequestBody RegisterRequest registerRequest) {
+        return ResponseEntity.ok(authService.signUp(registerRequest));
     }
 
     @PostMapping("/signin")
