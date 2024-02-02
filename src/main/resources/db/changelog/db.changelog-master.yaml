@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - logicalFilePath: db/changelog/db.changelog-lesson1.yaml
+  - include:
+      file: db/changelog/changeset/create-user-table.yaml
+  - include:
+      file: db/changelog/changeset/create-token-sequence.yaml
+  - include:
+      file: db/changelog/changeset/create-learninglang-table.yaml
+  - include:
+      file: db/changelog/changeset/create-token-table.yaml
