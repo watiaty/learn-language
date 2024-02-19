@@ -15,12 +15,12 @@ plugins {
 
 group = 'by.waitaty.learn-language'
 version = '0.0.1-SNAPSHOT'
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'application'
 
 java {
 	sourceCompatibility = '17'
-	toolchain {
-		languageVersion.set(JavaLanguageVersion.of(17))
-	}
 }
 
 configurations {
@@ -30,6 +30,7 @@ configurations {
 }
 
 repositories {
+	mavenLocal()
 	mavenCentral()
 }
 
@@ -50,6 +51,6 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
+bootJar {
+	duplicatesStrategy = 'EXCLUDE'
 }
