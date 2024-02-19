@@ -1,0 +1,1 @@
+web: java -jar -Dspring.profiles.active=production target/learning-lang.jar
