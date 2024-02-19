@@ -1,4 +1,7 @@
 spring:
+  config:
+    activate:
+      on-profile: dev
   datasource:
     url: jdbc:postgresql://localhost:5432/learn-language
     username: postgres
@@ -12,6 +15,28 @@ spring:
     hibernate:
         ddl-auto: validate
     show-sql: true
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: production
+  datasource:
+    url: ${JDBC_DATABASE_URL}
+    username: postgres
+    password: root
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        generate-ddl: false
+        ddl-auto: false
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+---
 
 application:
   security:
