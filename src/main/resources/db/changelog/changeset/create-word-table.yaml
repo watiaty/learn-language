@@ -1,0 +1,28 @@
+databaseChangeLog:
+  - changeSet:
+      id: crate-word-table
+      author: Yauheni Haikou
+      changes:
+        - createTable:
+            tableName: word
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: lang
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: word
+                  type: varchar(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: transcription
+                  type: varchar(128)

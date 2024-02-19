@@ -7,8 +7,9 @@ databaseChangeLog:
                 tableName: user_learning_lang
                 columns:
                   - column:
-                      name: lang
-                      type: varchar(2)
+                      name: id
+                      type: BIGINT
+                      autoIncrement: true
                       constraints:
                         primaryKey: true
                   - column:

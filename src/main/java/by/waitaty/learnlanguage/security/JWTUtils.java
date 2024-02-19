@@ -2,7 +2,6 @@ package by.waitaty.learnlanguage.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -17,10 +16,8 @@ import java.util.function.Function;
 @Component
 public class JWTUtils {
     private final SecretKey key;
-    @Value("${application.security.jwt.expiration}")
-    private static long EXPIRATION_TIME;
-    @Value("${application.security.jwt.refresh-token.expiration}")
-    private static long REFRESH_EXPIRATION_TIME;
+    private static final long EXPIRATION_TIME = 86400000;
+    private static final long REFRESH_EXPIRATION_TIME = 604800000;
 
 
     public JWTUtils() {

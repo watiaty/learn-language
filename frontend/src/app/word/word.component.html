@@ -1,0 +1,71 @@
+<div class="card my-5">
+  <div class="card-body">
+    <div class="d-flex align-items-center">
+      <a mat-button (click)="playWord(word.word)">
+        <mat-icon>volume_up</mat-icon>
+        [ {{ word.transcription }} ]
+      </a>
+    </div>
+    <h1>{{ word.word }}
+      <ng-container [ngSwitch]="word.language">
+<!--        <img *ngSwitchCase="'Polish'" src="path_to_polish_flag_image" alt="Polish Flag">-->
+<!--        <img *ngSwitchCase="'Russian'" src="path_to_russian_flag_image" alt="Russian Flag">-->
+        <img *ngSwitchCase="'English'" src="assets/flags/english.jpg" width="32px" alt="English Flag">
+      </ng-container>
+    </h1>
+
+    <mat-form-field class="example-form-field me-4 d-flex">
+      <mat-label>Add new translation</mat-label>
+      <input matInput type="text" [(ngModel)]="valueTranslation" (keyup.enter)="onInputKeyUp()">
+      @if (valueTranslation) {
+      <button matSuffix mat-icon-button aria-label="Clear" (click)="valueTranslation=''">
+        <mat-icon>close</mat-icon>
+      </button>
+      }
+    </mat-form-field>
+    <div class="container">
+      <div class="row align-items-start">
+        <div class="col">
+          <tr>My translations</tr>
+          <ng-container *ngFor="let translation of word.translations">
+            <ng-container *ngIf="translation.user">
+              <p>
+                <a mat-fab extended color="basic" class="me-3" (click)="delete(translation.id)">
+                  {{ translation.translation }}
+                  <mat-icon>close</mat-icon>
+                </a>
+              </p>
+            </ng-container>
+          </ng-container>
+        </div>
+        <div class="col">
+          <tr>
+            <mat-label>Other translations</mat-label>
+          </tr>
+          <ng-container *ngFor="let translation of word.translations">
+            <ng-container *ngIf="!translation.user">
+              <p>
+                <a mat-fab extended color="basic" class="me-3" (click)="add(translation.id)">
+                  {{ translation.translation }}
+                  <mat-icon>add</mat-icon>
+                </a>
+                @if (role == 'ADMIN') {
+                <a mat-fab color="basic" (click)="deleteForever(translation.id)">
+                  <mat-icon>delete</mat-icon>
+                </a>
+                }
+              </p>
+            </ng-container>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+    <tr>Hashtags</tr>
+    <ng-container *ngFor="let hashtag of word.hashtags">
+      <a mat-fab extended color="basic" class="me-3">
+        {{ hashtag.name  }}
+        <mat-icon>tag</mat-icon>
+      </a>
+    </ng-container>
+  </div>
+</div>

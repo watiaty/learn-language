@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-word-hashtag-table
+      author: Yauheni Haikou
+      changes:
+        - createTable:
+            tableName: word_hashtag
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: word_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: id_hashtag_word
+                    referencedTableName: word
+                    referencedColumnNames: id
+              - column:
+                  name: hashtag_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: id_hashtag
+                    referencedTableName: hashtag
+                    referencedColumnNames: id

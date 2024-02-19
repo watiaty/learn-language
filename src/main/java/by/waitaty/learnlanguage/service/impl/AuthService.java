@@ -1,9 +1,11 @@
 package by.waitaty.learnlanguage.service.impl;
 
+import by.waitaty.learnlanguage.dto.Mapper;
 import by.waitaty.learnlanguage.dto.request.AuthenticationRequest;
 import by.waitaty.learnlanguage.dto.request.RefreshTokenRequest;
 import by.waitaty.learnlanguage.dto.request.RegisterRequest;
 import by.waitaty.learnlanguage.dto.response.AuthenticationResponse;
+import by.waitaty.learnlanguage.entity.Language;
 import by.waitaty.learnlanguage.entity.Role;
 import by.waitaty.learnlanguage.entity.User;
 import by.waitaty.learnlanguage.exception.NotValidAccessTokenException;
@@ -12,35 +14,37 @@ import by.waitaty.learnlanguage.security.JWTUtils;
 import by.waitaty.learnlanguage.token.Token;
 import by.waitaty.learnlanguage.token.TokenRepository;
 import by.waitaty.learnlanguage.token.TokenType;
+import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class AuthService {
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
     private final JWTUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-
-    public AuthService(UserRepository userRepository, TokenRepository tokenRepository, JWTUtils jwtUtils, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
-        this.userRepository = userRepository;
-        this.tokenRepository = tokenRepository;
-        this.jwtUtils = jwtUtils;
-        this.passwordEncoder = passwordEncoder;
-        this.authenticationManager = authenticationManager;
-    }
+    private Mapper mapper;
 
     public AuthenticationResponse signUp(RegisterRequest registerRequest) {
+        List<Language> learningLang = new ArrayList<>();
+        learningLang.add(Language.EN);
+        learningLang.add(Language.PL);
         User user = User.builder()
                 .username(registerRequest.getUsername())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .firstName(registerRequest.getFirstname())
                 .lastName(registerRequest.getLastname())
+                .learningLang(learningLang)
+                .nativeLang(Language.RU)
                 .role(Role.USER)
                 .build();
         var savedUser = userRepository.save(user);
@@ -70,6 +74,7 @@ public class AuthService {
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
+                .user(mapper.userToUserDtoResponse(user))
                 .build();
     }
 

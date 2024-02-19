@@ -8,3 +8,15 @@ databaseChangeLog:
       file: db/changelog/changeset/create-learninglang-table.yaml
   - include:
       file: db/changelog/changeset/create-token-table.yaml
+  - include:
+      file: db/changelog/changeset/create-word-table.yaml
+  - include:
+      file: db/changelog/changeset/create-translation-table.yaml
+  - include:
+      file: db/changelog/changeset/create-user-word-table.yaml
+  - include:
+      file: db/changelog/changeset/create-user-translation-table.yaml
+  - include:
+      file: db/changelog/changeset/create-hashtag-table.yaml
+  - include:
+      file: db/changelog/changeset/create-word_hashtag-table.yaml
