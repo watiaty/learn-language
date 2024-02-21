@@ -53,4 +53,8 @@ public class UserWordServiceImpl implements UserWordService {
     public UserWord getUserWordByTranslationAndUser(Translation translation, User user) {
         return userWordRepository.findUSerWordByTranslationsContainsAndUser(translation, user);
     }
+
+    public void delete(Long id) {
+        userWordRepository.deleteById(id);
+    }
 }

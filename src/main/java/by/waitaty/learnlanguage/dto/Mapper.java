@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 public class Mapper {
     public UserWordDtoResponse userWordToWordDtoResponse(UserWord userWord) {
         return UserWordDtoResponse.builder()
+                .id(userWord.getId())
                 .word(userWord.getWord().getWord())
                 .transcription(userWord.getWord().getTranscription())
                 .translations(userWord.getTranslations().stream().map(Translation::getTranslation).toList())

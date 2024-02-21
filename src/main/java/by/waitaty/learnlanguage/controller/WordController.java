@@ -132,6 +132,14 @@ public class WordController {
     }
 
     @Transactional
+    @PostMapping("/delete")
+    @SecurityRequirement(name = "JWT")
+    public void deleteUserWord(@RequestBody Long id, Principal principal) {
+        User user = userService.findByUsername(principal.getName()).orElseThrow();
+        userWordService.delete(id);
+    }
+
+    @Transactional
     @PostMapping("/translation/fulldelete")
     @SecurityRequirement(name = "JWT")
     public void deleteTranslation(@RequestBody Long id) {
