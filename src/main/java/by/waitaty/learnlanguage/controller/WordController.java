@@ -183,21 +183,22 @@ public class WordController {
                 .lang(addWordRequest.getLang())
                 .transcription(addWordRequest.getTranscription())
                 .build());
-        Translation translation = wordTranslationService.addWordTranslation(
-                Translation.builder()
-                        .translation(addWordRequest.getTranslations())
-                        .word(word)
-                        .user(user)
-                        .numberOfUses(0L)
-                        .lang(user.getNativeLang())
-                        .build()
-        );
         UserWord userWord = UserWord.builder()
                 .user(user)
                 .word(word)
                 .isLearning(true)
                 .build();
-        userWord.addTranslation(translation);
+        for (String translation: addWordRequest.getTranslations()) {
+            userWord.addTranslation(wordTranslationService.addWordTranslation(
+                    Translation.builder()
+                            .translation(translation)
+                            .word(word)
+                            .user(user)
+                            .numberOfUses(0L)
+                            .lang(user.getNativeLang())
+                            .build()
+            ));
+        }
         userWordService.update(userWord);
         return ResponseEntity.ok("Word was successfully added");
     }

@@ -40,7 +40,7 @@ public class UserWord {
     @JoinColumn(name = "id_word", nullable = false)
     private Word word;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinTable(
             name = "user_translation",
             joinColumns = @JoinColumn(name = "id_user_word"),

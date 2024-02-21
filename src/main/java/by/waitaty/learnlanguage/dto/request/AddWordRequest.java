@@ -13,6 +13,6 @@ import lombok.NoArgsConstructor;
 public class AddWordRequest {
     private Language lang;
     private String word;
-    private String translations;
+    private String[] translations;
     private String transcription;
 }
