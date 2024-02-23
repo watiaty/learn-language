@@ -1,5 +1,6 @@
 package by.waitaty.learnlanguage.repository;
 
+import by.waitaty.learnlanguage.entity.Language;
 import by.waitaty.learnlanguage.entity.Translation;
 import by.waitaty.learnlanguage.entity.User;
 import by.waitaty.learnlanguage.entity.UserWord;
@@ -23,7 +24,7 @@ public interface UserWordRepository extends JpaRepository<UserWord, Long> {
 //    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, attributePaths = "translation.word")
     List<UserWord> findAllByUserOrderByIdAsc(User user);
 
-    List<UserWord> findAllByUser(User user, Pageable pageable);
+    List<UserWord> findAllByUserAndIsLearningAndWordLang(User user, boolean isLearning, Language language, Pageable pageable);
 
     Optional<UserWord> findUserWordByWordAndUser(Word word, User user);
 

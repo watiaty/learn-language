@@ -1,5 +1,7 @@
 package by.waitaty.learnlanguage.service.impl;
 
+import by.waitaty.learnlanguage.entity.Language;
+import by.waitaty.learnlanguage.entity.StatusUserWord;
 import by.waitaty.learnlanguage.entity.Translation;
 import by.waitaty.learnlanguage.entity.User;
 import by.waitaty.learnlanguage.entity.UserWord;
@@ -33,9 +35,13 @@ public class UserWordServiceImpl implements UserWordService {
         return userWordRepository.findAllByUserOrderByIdAsc(user);
     }
 
-    public List<UserWord> getCountWords(int count, User user) {
+    public List<UserWord> getCountLearningWords(int count, StatusUserWord statusUserWord, Language language, User user) {
         Pageable pageable = PageRequest.of(0, count);
-        return userWordRepository.findAllByUser(user, pageable);
+        if (statusUserWord == StatusUserWord.LEARNING) {
+            return userWordRepository.findAllByUserAndIsLearningAndWordLang(user, true, language, pageable);
+        } else {
+            return userWordRepository.findAllByUserAndIsLearningAndWordLang(user, false, language, pageable);
+        }
     }
 
     public Optional<UserWord> getUserWordByWord(Word word, User user) {

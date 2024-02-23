@@ -3,6 +3,7 @@ package by.waitaty.learnlanguage.controller;
 import by.waitaty.learnlanguage.dto.Mapper;
 import by.waitaty.learnlanguage.dto.request.AddNewTranslationRequest;
 import by.waitaty.learnlanguage.dto.request.AddWordRequest;
+import by.waitaty.learnlanguage.dto.request.WordTrainDtoRequest;
 import by.waitaty.learnlanguage.dto.response.TranslationSummaryDtoResponse;
 import by.waitaty.learnlanguage.dto.response.UserWordDtoResponse;
 import by.waitaty.learnlanguage.dto.response.WordDtoResponse;
@@ -52,12 +53,12 @@ public class WordController {
                 .toList();
     }
 
-    @GetMapping(path = "/train")
+    @PostMapping(path = "/train")
     @SecurityRequirement(name = "JWT")
     @ResponseBody
-    public List<UserWordDtoResponse> getWordsForTraining(@RequestParam("count") int countWord, Principal principal) {
+    public List<UserWordDtoResponse> getWordsForTraining(@RequestBody WordTrainDtoRequest wordTrainDtoRequest, Principal principal) {
         User user = userService.findByUsername(principal.getName()).orElseThrow();
-        List<UserWord> userWords = userWordService.getCountWords(countWord, user);
+        List<UserWord> userWords = userWordService.getCountLearningWords(wordTrainDtoRequest.getQuantity(), wordTrainDtoRequest.getStatus(), wordTrainDtoRequest.getLanguage(), user);
         return userWords.stream()
                 .map(mapper::userWordToWordDtoResponse)
                 .toList();
