@@ -63,4 +63,8 @@ public class UserWordServiceImpl implements UserWordService {
     public void delete(Long id) {
         userWordRepository.deleteById(id);
     }
+
+    public Optional<UserWord> findById(Long id) {
+        return userWordRepository.findById(id);
+    }
 }
