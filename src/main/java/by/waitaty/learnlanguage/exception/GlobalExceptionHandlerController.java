@@ -3,6 +3,8 @@ package by.waitaty.learnlanguage.exception;
 import by.waitaty.learnlanguage.dto.ErrorResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -52,13 +54,13 @@ public class GlobalExceptionHandlerController {
         return errorResponseDto;
     }
 
-    @ExceptionHandler(AuthenticationException.class)
+    @ExceptionHandler({AuthenticationTokenException.class, AuthenticationException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorResponseDto handleAuthenticationException(RuntimeException ex) {
         log.info(ex.getMessage(), ex);
         ErrorResponseDto errorResponseDto = new ErrorResponseDto();
         errorResponseDto.setStatus("401");
-        errorResponseDto.setMessage(ex.getMessage());
+        errorResponseDto.setError(ex.getMessage());
         return errorResponseDto;
     }
 }

@@ -16,6 +16,7 @@ import by.waitaty.learnlanguage.token.TokenRepository;
 import by.waitaty.learnlanguage.token.TokenType;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -64,6 +65,7 @@ public class AuthService {
                 authenticationRequest.getUsername(),
                 authenticationRequest.getPassword()
         ));
+
         var user = userRepository.findByUsername(authenticationRequest.getUsername()).orElseThrow();
         var jwtToken = jwtUtils.generateToken(user);
         var refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(), user);
