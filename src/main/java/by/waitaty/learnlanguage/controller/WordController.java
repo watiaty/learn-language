@@ -73,7 +73,7 @@ public class WordController {
     }
 
     @PostMapping("/update/learned")
-    public void setLearnedStatusWord(@RequestBody Long id, Principal principal) {
+    public void setLearnedStatusWord(@RequestBody Long id) {
         UserWord userWord = userWordService.findById(id).get();
         userWord.setLearning(false);
         userWordService.update(userWord);

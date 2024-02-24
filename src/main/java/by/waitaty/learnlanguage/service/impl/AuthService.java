@@ -9,6 +9,8 @@ import by.waitaty.learnlanguage.entity.Language;
 import by.waitaty.learnlanguage.entity.Role;
 import by.waitaty.learnlanguage.entity.User;
 import by.waitaty.learnlanguage.exception.NotValidAccessTokenException;
+import by.waitaty.learnlanguage.exception.UserEmailAlreadyExistsException;
+import by.waitaty.learnlanguage.exception.UsernameAlreadyExistException;
 import by.waitaty.learnlanguage.repository.UserRepository;
 import by.waitaty.learnlanguage.security.JWTUtils;
 import by.waitaty.learnlanguage.token.Token;
@@ -36,6 +38,7 @@ public class AuthService {
     private Mapper mapper;
 
     public AuthenticationResponse signUp(RegisterRequest registerRequest) {
+        if(userRepository.findByUsername(registerRequest.getUsername()).isPresent()) throw new UsernameAlreadyExistException(registerRequest.getUsername());
         List<Language> learningLang = new ArrayList<>();
         learningLang.add(Language.EN);
         learningLang.add(Language.PL);

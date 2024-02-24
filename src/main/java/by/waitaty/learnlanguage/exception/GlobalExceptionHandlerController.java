@@ -35,7 +35,7 @@ public class GlobalExceptionHandlerController {
 //    }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler({UserEmailAlreadyExistsException.class, TranslationAlreadyExistsException.class})
+    @ExceptionHandler({ TranslationAlreadyExistsException.class})
     public ErrorResponseDto handleEventTypeException(RuntimeException ex) {
         log.info(ex.getMessage(), ex);
         ErrorResponseDto errorResponseDto = new ErrorResponseDto();
@@ -60,6 +60,16 @@ public class GlobalExceptionHandlerController {
         log.info(ex.getMessage(), ex);
         ErrorResponseDto errorResponseDto = new ErrorResponseDto();
         errorResponseDto.setStatus("401");
+        errorResponseDto.setError(ex.getMessage());
+        return errorResponseDto;
+    }
+
+    @ExceptionHandler({UserEmailAlreadyExistsException.class, UsernameAlreadyExistException.class})
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponseDto handleConflictException(RuntimeException ex) {
+        log.info(ex.getMessage(), ex);
+        ErrorResponseDto errorResponseDto = new ErrorResponseDto();
+        errorResponseDto.setStatus("409");
         errorResponseDto.setError(ex.getMessage());
         return errorResponseDto;
     }
