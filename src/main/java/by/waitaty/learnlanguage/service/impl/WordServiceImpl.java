@@ -43,4 +43,8 @@ public class WordServiceImpl implements WordService {
     public Word findWordById(Long id) {
         return wordRepository.findById(id).orElseThrow();
     }
+
+    public List<Word> searchWords(String searchText, Language language) {
+        return wordRepository.findAllByWordStartingWithAndAndLang(searchText, language);
+    }
 }

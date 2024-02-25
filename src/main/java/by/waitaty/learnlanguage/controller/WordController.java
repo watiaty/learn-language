@@ -8,6 +8,7 @@ import by.waitaty.learnlanguage.dto.response.TranslationSummaryDtoResponse;
 import by.waitaty.learnlanguage.dto.response.UserWordDtoResponse;
 import by.waitaty.learnlanguage.dto.response.WordDtoResponse;
 import by.waitaty.learnlanguage.dto.response.WordInfoDtoResponse;
+import by.waitaty.learnlanguage.entity.Language;
 import by.waitaty.learnlanguage.entity.Translation;
 import by.waitaty.learnlanguage.entity.User;
 import by.waitaty.learnlanguage.entity.UserWord;
@@ -77,6 +78,20 @@ public class WordController {
         UserWord userWord = userWordService.findById(id).get();
         userWord.setLearning(false);
         userWordService.update(userWord);
+    }
+
+    @GetMapping("/search")
+    public List<WordInfoDtoResponse> search(@RequestParam("word") String searchText, @RequestParam("lang") String language) {
+        return wordService.searchWords(searchText, Language.getLanguageFromString(language)).stream()
+                .map(word -> WordInfoDtoResponse.builder()
+                        .id(word.getId().toString())
+                        .word(word.getWord())
+                        .translations(word.getTranslations().stream()
+                                .map(translation -> mapper.wordTranslationSummaryDtoResponse(translation, false))
+                                .toList())
+                        .transcription(word.getTranscription())
+                        .lang(word.getLang().getId())
+                        .build()).toList();
     }
 
 

@@ -56,4 +56,13 @@ public enum Language {
     }
 
     private final String id;
+
+    public static Language getLanguageFromString(String id) {
+        for (Language language : Language.values()) {
+            if (language.getId().equalsIgnoreCase(id)) {
+                return language;
+            }
+        }
+        return null;
+    }
 }

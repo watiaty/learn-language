@@ -17,6 +17,9 @@ public interface WordRepository extends JpaRepository<Word, Long> {
 
     Word findByWord(String name);
 
+    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, attributePaths = {"hashtags", "translations"})
+    List<Word> findAllByWordStartingWithAndAndLang(String searchText, Language language);
+
     @Override
     @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, attributePaths = {"hashtags", "translations"})
     List<Word> findAll();
