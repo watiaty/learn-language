@@ -199,11 +199,11 @@ public class WordController {
 
     @PostMapping("/add")
     @SecurityRequirement(name = "JWT")
-    public ResponseEntity<String> addWord(@RequestBody AddWordRequest addWordRequest, Principal principal) {
+    public ResponseEntity<?> addWord(@RequestBody AddWordRequest addWordRequest, Principal principal) {
         User user = userService.findByUsername(principal.getName()).orElseThrow();
         Word word = wordService.addWord(Word.builder()
                 .word(addWordRequest.getWord())
-                .lang(addWordRequest.getLang())
+                .lang(Language.getLanguageFromString(addWordRequest.getLang()))
                 .transcription(addWordRequest.getTranscription())
                 .build());
         UserWord userWord = UserWord.builder()
@@ -222,7 +222,6 @@ public class WordController {
                             .build()
             ));
         }
-        userWordService.update(userWord);
-        return ResponseEntity.ok("Word was successfully added");
+        return ResponseEntity.ok(userWordService.update(userWord));
     }
 }

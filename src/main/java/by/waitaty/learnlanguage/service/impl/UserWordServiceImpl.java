@@ -52,8 +52,8 @@ public class UserWordServiceImpl implements UserWordService {
         userWordRepository.deleteTranslationByTranslationAndUser(id, userId);
     }
 
-    public void update(UserWord userWord) {
-        userWordRepository.save(userWord);
+    public UserWord update(UserWord userWord) {
+        return userWordRepository.save(userWord);
     }
 
     public UserWord getUserWordByTranslationAndUser(Translation translation, User user) {
