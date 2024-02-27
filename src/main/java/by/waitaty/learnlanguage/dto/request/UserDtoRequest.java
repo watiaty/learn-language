@@ -14,6 +14,6 @@ public class UserDtoRequest {
     private String firstName;
     private String lastName;
     private String email;
-    private Language nativeLang;
-    private List<Language> learningLang;
+    private String nativeLang;
+    private List<String> learningLangs;
 }

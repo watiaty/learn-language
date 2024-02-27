@@ -3,6 +3,7 @@ package by.waitaty.learnlanguage.controller;
 import by.waitaty.learnlanguage.dto.Mapper;
 import by.waitaty.learnlanguage.dto.request.UserDtoRequest;
 import by.waitaty.learnlanguage.dto.response.UserDtoResponse;
+import by.waitaty.learnlanguage.entity.Language;
 import by.waitaty.learnlanguage.entity.User;
 import by.waitaty.learnlanguage.service.impl.UserServiceImpl;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/user")
@@ -37,9 +40,12 @@ public class UserController {
         if (!userDto.getFirstName().isEmpty() || !userDto.getFirstName().equals(user.getFirstName())) user.setFirstName(userDto.getFirstName());
         if (!userDto.getLastName().isEmpty() || !userDto.getLastName().equals(user.getLastName())) user.setLastName(userDto.getLastName());
         if (!userDto.getEmail().isEmpty() || !userDto.getEmail().equals(user.getEmail())) user.setEmail(userDto.getEmail());
-        if (userDto.getNativeLang() != user.getNativeLang()) user.setFirstName(userDto.getFirstName());
-        // Update
-//        if (userDto.getLearningLang() != user.getLearningLang()) user.setLearningLang(userDto.getLearningLang());
-        return ResponseEntity.ok(mapper.userToUserDtoResponse(userService.updateUser(user)));
+        if (Language.getLanguageFromString(userDto.getNativeLang()) != user.getNativeLang()) user.setNativeLang(Language.getLanguageFromString(userDto.getNativeLang()));
+        List<Language> newLearningLangs = userDto.getLearningLangs().stream()
+                .map(Language::getLanguageFromString)
+                .collect(Collectors.toList());
+        user.setLearningLang(newLearningLangs);
+        User updatedUser = userService.updateUser(user);
+        return ResponseEntity.ok(mapper.userToUserDtoResponse(updatedUser));
     }
 }

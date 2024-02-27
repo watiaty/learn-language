@@ -60,6 +60,7 @@ public class AuthService {
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
+                .user(mapper.userToUserDtoResponse(savedUser))
                 .build();
     }
 
