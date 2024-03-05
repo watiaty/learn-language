@@ -61,7 +61,7 @@ public class WordController {
     @ResponseBody
     public List<UserWordDtoResponse> getWordsForTraining(@RequestBody WordTrainDtoRequest wordTrainDtoRequest, Principal principal) {
         User user = userService.findByUsername(principal.getName()).orElseThrow();
-        List<UserWord> userWords = userWordService.getCountLearningWords(wordTrainDtoRequest.getQuantity(), wordTrainDtoRequest.getStatus(), wordTrainDtoRequest.getLanguage(), user);
+        List<UserWord> userWords = userWordService.getCountLearningWords(wordTrainDtoRequest.getQuantity(), wordTrainDtoRequest.getStatus(), Language.getLanguageFromString(wordTrainDtoRequest.getLanguage()), user);
         return userWords.stream()
                 .map(mapper::userWordToWordDtoResponse)
                 .toList();

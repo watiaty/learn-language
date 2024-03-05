@@ -14,5 +14,5 @@ import lombok.NoArgsConstructor;
 public class WordTrainDtoRequest {
     private int quantity;
     private StatusUserWord status;
-    private Language language;
+    private String language;
 }
