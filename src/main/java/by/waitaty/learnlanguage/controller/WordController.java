@@ -30,6 +30,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,6 +79,15 @@ public class WordController {
     public void setLearnedStatusWord(@RequestBody Long id) {
         UserWord userWord = userWordService.findById(id).get();
         userWord.setLearning(false);
+        userWord.setDate(new Timestamp(System.currentTimeMillis()));
+        userWordService.update(userWord);
+    }
+
+    @PostMapping("/update/learning")
+    public void setLearningStatusWord(@RequestBody Long id) {
+        UserWord userWord = userWordService.findById(id).get();
+        userWord.setLearning(true);
+        userWord.setDate(new Timestamp(System.currentTimeMillis()));
         userWordService.update(userWord);
     }
 

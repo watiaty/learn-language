@@ -24,7 +24,9 @@ public interface UserWordRepository extends JpaRepository<UserWord, Long> {
 //    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, attributePaths = "translation.word")
     List<UserWord> findAllByUserOrderByIdAsc(User user);
 
-    List<UserWord> findAllByUserAndIsLearningAndWordLang(User user, boolean isLearning, Language language, Pageable pageable);
+    List<UserWord> findAllByUserAndIsLearningAndWordLangOrderByDateAsc(User user, boolean isLearning, Language language, Pageable pageable);
+
+    List<UserWord> findAllByUserAndWordLangOrderByIsLearningDescDateAsc(User user, Language language, Pageable pageable);
 
     Optional<UserWord> findUserWordByWordAndUser(Word word, User user);
 

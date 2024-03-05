@@ -38,10 +38,12 @@ public class UserWordServiceImpl implements UserWordService {
     public List<UserWord> getCountLearningWords(int count, StatusUserWord statusUserWord, Language language, User user) {
         Pageable pageable = PageRequest.of(0, count);
         if (statusUserWord == StatusUserWord.LEARNING) {
-            return userWordRepository.findAllByUserAndIsLearningAndWordLang(user, true, language, pageable);
-        } else {
-            return userWordRepository.findAllByUserAndIsLearningAndWordLang(user, false, language, pageable);
+            return userWordRepository.findAllByUserAndIsLearningAndWordLangOrderByDateAsc(user, true, language, pageable);
         }
+        if (statusUserWord == StatusUserWord.LEARNED) {
+            return userWordRepository.findAllByUserAndIsLearningAndWordLangOrderByDateAsc(user, false, language, pageable);
+        }
+        return userWordRepository.findAllByUserAndWordLangOrderByIsLearningDescDateAsc(user, language, pageable);
     }
 
     public Optional<UserWord> getUserWordByWord(Word word, User user) {

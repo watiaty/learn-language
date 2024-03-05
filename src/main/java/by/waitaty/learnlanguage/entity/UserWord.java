@@ -17,7 +17,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -48,6 +50,8 @@ public class UserWord {
     private List<Translation> translations;
 
     private boolean isLearning;
+
+    private Timestamp date;
 
     public void addTranslation(Translation translation) {
         if (translations == null) translations = new ArrayList<>();

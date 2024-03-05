@@ -20,3 +20,5 @@ databaseChangeLog:
       file: db/changelog/changeset/create-hashtag-table.yaml
   - include:
       file: db/changelog/changeset/create-word_hashtag-table.yaml
+  - include:
+      file: db/changelog/changeset/add-column-date-to-user_word.yaml
