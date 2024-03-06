@@ -36,6 +36,7 @@ public class UserWordServiceImpl implements UserWordService {
     }
 
     public List<UserWord> getCountLearningWords(int count, StatusUserWord statusUserWord, Language language, User user) {
+        if (count == 0) count = Integer.MAX_VALUE;
         Pageable pageable = PageRequest.of(0, count);
         if (statusUserWord == StatusUserWord.LEARNING) {
             return userWordRepository.findAllByUserAndIsLearningAndWordLangOrderByDateAsc(user, true, language, pageable);
