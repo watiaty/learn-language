@@ -22,3 +22,11 @@ databaseChangeLog:
       file: db/changelog/changeset/create-word_hashtag-table.yaml
   - include:
       file: db/changelog/changeset/add-column-date-to-user_word.yaml
+  - include:
+      file: db/changelog/changeset/add-stage-column-to-user_word.yaml
+  - include:
+      file: db/changelog/changeset/rename-field-date-to-last_repeat.yaml
+  - include:
+      file: db/changelog/changeset/remove-is_learning-column.yaml
+  - include:
+      file: db/changelog/changeset/change-repeat_date-column-type.yaml

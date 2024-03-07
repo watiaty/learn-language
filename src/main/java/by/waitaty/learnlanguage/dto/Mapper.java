@@ -22,7 +22,6 @@ public class Mapper {
                 .transcription(userWord.getWord().getTranscription())
                 .translations(userWord.getTranslations().stream().map(Translation::getTranslation).toList())
                 .lang(userWord.getWord().getLang().getId())
-                .status(userWord.isLearning())
                 .build();
     }
 

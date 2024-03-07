@@ -13,6 +13,6 @@ public class WordInfoDtoResponse {
     private String id;
     private String word;
     private String transcription;
-    private String lang;
+    private String language;
     private List<TranslationSummaryDtoResponse> translations;
 }

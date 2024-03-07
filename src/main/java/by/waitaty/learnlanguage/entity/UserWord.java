@@ -17,9 +17,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 
 @Data
@@ -49,9 +48,9 @@ public class UserWord {
             inverseJoinColumns = @JoinColumn(name = "id_translation"))
     private List<Translation> translations;
 
-    private boolean isLearning;
+    private int repeatStage;
 
-    private Timestamp date;
+    private Date repeatDate;
 
     public void addTranslation(Translation translation) {
         if (translations == null) translations = new ArrayList<>();

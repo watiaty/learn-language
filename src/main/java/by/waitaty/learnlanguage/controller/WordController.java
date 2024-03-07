@@ -30,8 +30,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,7 +61,7 @@ public class WordController {
     @ResponseBody
     public List<UserWordDtoResponse> getWordsForTraining(@RequestBody WordTrainDtoRequest wordTrainDtoRequest, Principal principal) {
         User user = userService.findByUsername(principal.getName()).orElseThrow();
-        List<UserWord> userWords = userWordService.getCountLearningWords(wordTrainDtoRequest.getQuantity(), wordTrainDtoRequest.getStatus(), Language.getLanguageFromString(wordTrainDtoRequest.getLanguage()), user);
+        List<UserWord> userWords = userWordService.getCountLearningWords(wordTrainDtoRequest.getQuantity(), Language.getLanguageFromString(wordTrainDtoRequest.getLanguage()), user);
         return userWords.stream()
                 .map(mapper::userWordToWordDtoResponse)
                 .toList();
@@ -78,22 +78,22 @@ public class WordController {
     @PostMapping("/update/learned")
     public void setLearnedStatusWord(@RequestBody Long id) {
         UserWord userWord = userWordService.findById(id).get();
-        userWord.setLearning(false);
-        userWord.setDate(new Timestamp(System.currentTimeMillis()));
+        if (userWord.getRepeatStage() < 5) userWord.setRepeatStage(userWord.getRepeatStage() + 1);
+        userWord.setRepeatDate(Date.valueOf(LocalDate.now()));
         userWordService.update(userWord);
     }
 
     @PostMapping("/update/learning")
     public void setLearningStatusWord(@RequestBody Long id) {
         UserWord userWord = userWordService.findById(id).get();
-        userWord.setLearning(true);
-        userWord.setDate(new Timestamp(System.currentTimeMillis()));
+        userWord.setRepeatStage(1);
+        userWord.setRepeatDate(Date.valueOf(LocalDate.now()));
         userWordService.update(userWord);
     }
 
     @GetMapping("/search")
-    public List<WordInfoDtoResponse> search(@RequestParam("word") String searchText, @RequestParam("lang") String language) {
-        return wordService.searchWords(searchText, Language.getLanguageFromString(language)).stream()
+    public List<WordInfoDtoResponse> search(@RequestParam("word") String searchText) {
+        return wordService.searchWords(searchText).stream()
                 .map(word -> WordInfoDtoResponse.builder()
                         .id(word.getId().toString())
                         .word(word.getWord())
@@ -101,7 +101,7 @@ public class WordController {
                                 .map(translation -> mapper.wordTranslationSummaryDtoResponse(translation, false))
                                 .toList())
                         .transcription(word.getTranscription())
-                        .lang(word.getLang().getId())
+                        .language(word.getLang().getId())
                         .build()).toList();
     }
 
@@ -131,7 +131,7 @@ public class WordController {
                 .word(word.getWord())
                 .translations(translationSummaryDtoResponses)
                 .transcription(word.getTranscription())
-                .lang(word.getLang().getId())
+                .language(word.getLang().getId())
                 .build();
     }
 
@@ -146,7 +146,8 @@ public class WordController {
             userWord = Optional.ofNullable(UserWord.builder()
                     .word(translation.getWord())
                     .user(user)
-                    .isLearning(true)
+                    .repeatStage(1)
+                    .repeatDate(Date.valueOf(LocalDate.now()))
                     .build());
         }
 
@@ -202,7 +203,8 @@ public class WordController {
             userWord = Optional.ofNullable(UserWord.builder()
                     .user(user)
                     .word(word)
-                    .isLearning(true)
+                    .repeatStage(1)
+                    .repeatDate(Date.valueOf(LocalDate.now()))
                     .build());
         }
         userWordService.update(userWord.get());
@@ -220,7 +222,8 @@ public class WordController {
         UserWord userWord = UserWord.builder()
                 .user(user)
                 .word(word)
-                .isLearning(true)
+                .repeatStage(1)
+                .repeatDate(Date.valueOf(LocalDate.now()))
                 .build();
         for (String translation: addWordRequest.getTranslations()) {
             userWord.addTranslation(wordTranslationService.addWordTranslation(
