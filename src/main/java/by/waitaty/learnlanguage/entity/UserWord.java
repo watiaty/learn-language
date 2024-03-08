@@ -17,8 +17,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.sql.Date;
 import java.util.List;
 
 @Data
@@ -50,7 +50,7 @@ public class UserWord {
 
     private int repeatStage;
 
-    private Date repeatDate;
+    private LocalDate repeatDate;
 
     public void addTranslation(Translation translation) {
         if (translations == null) translations = new ArrayList<>();

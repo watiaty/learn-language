@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -30,13 +31,23 @@ public class WordServiceImpl implements WordService {
     }
 
     @Override
-    public Word getWordByWordAndLang(String word, Language lang) {
-        return wordRepository.findFirstByWordAndLang(word, lang);
+    public Optional<Word> findWordByName(String name) {
+        return wordRepository.findByWord(name);
     }
 
     @Override
-    public Word findWordByName(String name) {
-        return wordRepository.findByWord(name);
+    public Word findOrCreateWord(String name, Language lang, String transcription) {
+        Optional<Word> existingWordOptional = findWordByName(name);
+        return existingWordOptional.orElseGet(() -> wordRepository.save(Word.builder()
+                .word(name)
+                .lang(lang)
+                .transcription(transcription)
+                .build()));
+    }
+
+    @Override
+    public Word getWordByWordAndLang(String word, Language lang) {
+        return wordRepository.findFirstByWordAndLang(word, lang);
     }
 
     @Override

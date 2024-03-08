@@ -13,6 +13,7 @@ import by.waitaty.learnlanguage.entity.Translation;
 import by.waitaty.learnlanguage.entity.User;
 import by.waitaty.learnlanguage.entity.UserWord;
 import by.waitaty.learnlanguage.entity.Word;
+import by.waitaty.learnlanguage.exception.WordNotFoundException;
 import by.waitaty.learnlanguage.service.impl.TranslationServiceImpl;
 import by.waitaty.learnlanguage.service.impl.UserServiceImpl;
 import by.waitaty.learnlanguage.service.impl.UserWordServiceImpl;
@@ -30,10 +31,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
-import java.sql.Date;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/word")
@@ -61,7 +61,10 @@ public class WordController {
     @ResponseBody
     public List<UserWordDtoResponse> getWordsForTraining(@RequestBody WordTrainDtoRequest wordTrainDtoRequest, Principal principal) {
         User user = userService.findByUsername(principal.getName()).orElseThrow();
-        List<UserWord> userWords = userWordService.getCountLearningWords(wordTrainDtoRequest.getQuantity(), Language.getLanguageFromString(wordTrainDtoRequest.getLanguage()), user);
+        List<UserWord> userWords = userWordService.getCountLearningWords(
+                wordTrainDtoRequest.getQuantity(),
+                Language.getLanguageFromString(wordTrainDtoRequest.getLanguage()), user
+        );
         return userWords.stream()
                 .map(mapper::userWordToWordDtoResponse)
                 .toList();
@@ -69,26 +72,31 @@ public class WordController {
 
     @GetMapping(path = "all")
     public List<WordDtoResponse> getAll() {
-        return wordService.findAll()
-                .stream()
+        return wordService.findAll().stream()
                 .map(mapper::wordToWordDtoResponse)
                 .toList();
     }
 
     @PostMapping("/update/learned")
     public void setLearnedStatusWord(@RequestBody Long id) {
-        UserWord userWord = userWordService.findById(id).get();
-        if (userWord.getRepeatStage() < 5) userWord.setRepeatStage(userWord.getRepeatStage() + 1);
-        userWord.setRepeatDate(Date.valueOf(LocalDate.now()));
-        userWordService.update(userWord);
+        userWordService.findById(id).ifPresent(userWord -> {
+            userWord.setRepeatDate(LocalDate.now());
+
+            if (userWord.getRepeatStage() < 5) {
+                userWord.setRepeatStage(userWord.getRepeatStage() + 1);
+            }
+
+            userWordService.update(userWord);
+        });
     }
 
     @PostMapping("/update/learning")
     public void setLearningStatusWord(@RequestBody Long id) {
-        UserWord userWord = userWordService.findById(id).get();
-        userWord.setRepeatStage(1);
-        userWord.setRepeatDate(Date.valueOf(LocalDate.now()));
-        userWordService.update(userWord);
+        userWordService.findById(id).ifPresent(userWord -> {
+            userWord.setRepeatStage(1);
+            userWord.setRepeatDate(LocalDate.now());
+            userWordService.update(userWord);
+        });
     }
 
     @GetMapping("/search")
@@ -102,29 +110,21 @@ public class WordController {
                                 .toList())
                         .transcription(word.getTranscription())
                         .language(word.getLang().getId())
-                        .build()).toList();
+                        .build())
+                .toList();
     }
-
 
     @GetMapping
     @SecurityRequirement(name = "JWT")
     public WordInfoDtoResponse getWord(@RequestParam("word") String name, Principal principal) {
+        Word word = wordService.findWordByName(name).orElseThrow(() -> new WordNotFoundException(name));
         User user = userService.findByUsername(principal.getName()).orElseThrow();
-        Word word = wordService.findWordByName(name);
-        Optional<UserWord> userWord = userWordService.getUserWordByWord(word, user);
-        List<TranslationSummaryDtoResponse> translationSummaryDtoResponses;
-        if (userWord.isPresent()) {
-            translationSummaryDtoResponses = word.getTranslations().stream()
-                    .map(translation -> {
-                        boolean contains = userWord.get().getTranslations().contains(translation);
-                        return mapper.wordTranslationSummaryDtoResponse(translation, contains);
-                    })
-                    .toList();
-        } else {
-            translationSummaryDtoResponses = word.getTranslations().stream()
-                    .map(translation -> mapper.wordTranslationSummaryDtoResponse(translation, false))
-                    .toList();
-        }
+        List<TranslationSummaryDtoResponse> translationSummaryDtoResponses = word.getTranslations().stream()
+                .map(translation -> {
+                    boolean contains = userWordService.getUserWordByTranslationAndUser(translation, user).isPresent();
+                    return mapper.wordTranslationSummaryDtoResponse(translation, contains);
+                })
+                .toList();
 
         return WordInfoDtoResponse.builder()
                 .id(word.getId().toString())
@@ -141,18 +141,16 @@ public class WordController {
     public void addTranslationToUser(@RequestBody Long id, Principal principal) {
         User user = userService.findByUsername(principal.getName()).orElseThrow();
         Translation translation = wordTranslationService.findById(id);
-        Optional<UserWord> userWord = userWordService.getUserWordByWord(translation.getWord(), user);
-        if (userWord.isEmpty()) {
-            userWord = Optional.ofNullable(UserWord.builder()
-                    .word(translation.getWord())
-                    .user(user)
-                    .repeatStage(1)
-                    .repeatDate(Date.valueOf(LocalDate.now()))
-                    .build());
-        }
+        UserWord userWord = userWordService.getUserWordByWord(translation.getWord(), user)
+                .orElse(UserWord.builder()
+                        .word(translation.getWord())
+                        .user(user)
+                        .repeatStage(1)
+                        .repeatDate(LocalDate.now())
+                        .build());
 
-        userWord.get().addTranslation(translation);
-        userWordService.update(userWord.get());
+        userWord.addTranslation(translation);
+        userWordService.update(userWord);
     }
 
     @Transactional
@@ -161,16 +159,18 @@ public class WordController {
     public void deleteTranslationToUser(@RequestBody Long id, Principal principal) {
         User user = userService.findByUsername(principal.getName()).orElseThrow();
         Translation translation = wordTranslationService.findById(id);
-        UserWord userWord = userWordService.getUserWordByTranslationAndUser(translation, user);
-        userWord.deleteTranslation(translation);
-        userWordService.update(userWord);
+
+        userWordService.getUserWordByTranslationAndUser(translation, user).ifPresent(userWord -> {
+            userWord.deleteTranslation(translation);
+            userWordService.update(userWord);
+        });
     }
+
 
     @Transactional
     @PostMapping("/delete")
     @SecurityRequirement(name = "JWT")
-    public void deleteUserWord(@RequestBody Long id, Principal principal) {
-        User user = userService.findByUsername(principal.getName()).orElseThrow();
+    public void deleteUserWord(@RequestBody Long id) {
         userWordService.delete(id);
     }
 
@@ -196,37 +196,38 @@ public class WordController {
                         .lang(user.getNativeLang())
                         .build()
         );
-        Optional<UserWord> userWord = userWordService.getUserWordByWord(word, user);
-        if (userWord.isPresent()) {
-            userWord.get().addTranslation(translation);
-        } else {
-            userWord = Optional.ofNullable(UserWord.builder()
-                    .user(user)
-                    .word(word)
-                    .repeatStage(1)
-                    .repeatDate(Date.valueOf(LocalDate.now()))
-                    .build());
-        }
-        userWordService.update(userWord.get());
+
+        UserWord userWord = userWordService.getUserWordByWord(word, user)
+                .orElseGet(() -> UserWord.builder()
+                        .user(user)
+                        .word(word)
+                        .repeatStage(1)
+                        .repeatDate(LocalDate.now())
+                        .build());
+
+        userWord.addTranslation(translation);
+        userWordService.update(userWord);
     }
 
     @PostMapping("/add")
     @SecurityRequirement(name = "JWT")
-    public ResponseEntity<?> addWord(@RequestBody AddWordRequest addWordRequest, Principal principal) {
+    public ResponseEntity<UserWordDtoResponse> addWord(@RequestBody AddWordRequest addWordRequest, Principal principal) {
         User user = userService.findByUsername(principal.getName()).orElseThrow();
-        Word word = wordService.addWord(Word.builder()
-                .word(addWordRequest.getWord())
-                .lang(Language.getLanguageFromString(addWordRequest.getLang()))
-                .transcription(addWordRequest.getTranscription())
-                .build());
+        Word word = wordService.findOrCreateWord(addWordRequest.getWord(), Language.getLanguageFromString(addWordRequest.getLang()), addWordRequest.getTranscription());
+        UserWord userWord = createUserWord(user, word, Arrays.stream(addWordRequest.getTranslations()).toList());
+        UserWord savedUserWord = userWordService.update(userWord);
+        return ResponseEntity.ok(mapper.userWordToWordDtoResponse(savedUserWord));
+    }
+
+    private UserWord createUserWord(User user, Word word, List<String> translations) {
         UserWord userWord = UserWord.builder()
                 .user(user)
                 .word(word)
                 .repeatStage(1)
-                .repeatDate(Date.valueOf(LocalDate.now()))
+                .repeatDate(LocalDate.now())
                 .build();
-        for (String translation: addWordRequest.getTranslations()) {
-            userWord.addTranslation(wordTranslationService.addWordTranslation(
+        translations.forEach(translation -> {
+            Translation translatedWord = wordTranslationService.addWordTranslation(
                     Translation.builder()
                             .translation(translation)
                             .word(word)
@@ -234,8 +235,9 @@ public class WordController {
                             .numberOfUses(0L)
                             .lang(user.getNativeLang())
                             .build()
-            ));
-        }
-        return ResponseEntity.ok(userWordService.update(userWord));
+            );
+            userWord.addTranslation(translatedWord);
+        });
+        return userWord;
     }
 }

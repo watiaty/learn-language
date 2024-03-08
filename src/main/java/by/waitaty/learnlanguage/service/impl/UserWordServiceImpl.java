@@ -43,7 +43,7 @@ public class UserWordServiceImpl implements UserWordService {
         return userWordRepository.save(userWord);
     }
 
-    public UserWord getUserWordByTranslationAndUser(Translation translation, User user) {
+    public Optional<UserWord> getUserWordByTranslationAndUser(Translation translation, User user) {
         return userWordRepository.findUSerWordByTranslationsContainsAndUser(translation, user);
     }
 

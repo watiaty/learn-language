@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface WordRepository extends JpaRepository<Word, Long> {
@@ -15,7 +16,7 @@ public interface WordRepository extends JpaRepository<Word, Long> {
 
     Word findFirstByWordAndLang(String word, Language lang);
 
-    Word findByWord(String name);
+    Optional<Word> findByWord(String name);
 
     @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, attributePaths = {"hashtags", "translations"})
     List<Word> findAllByWordStartingWith(String searchText);

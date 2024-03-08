@@ -45,5 +45,5 @@ public interface UserWordRepository extends JpaRepository<UserWord, Long> {
     @Query(value = "DELETE FROM user_translation WHERE id_translation = :translationId AND id_user = :userId", nativeQuery = true)
     void deleteTranslationByTranslationAndUser(@Param("translationId") Long wordId, @Param("userId") Long userId);
 
-    UserWord findUSerWordByTranslationsContainsAndUser(Translation translation, User user);
+    Optional<UserWord> findUSerWordByTranslationsContainsAndUser(Translation translation, User user);
 }
