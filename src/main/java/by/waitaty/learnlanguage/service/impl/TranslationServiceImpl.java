@@ -28,7 +28,7 @@ public class TranslationServiceImpl implements TranslationService {
 
     @Override
     public List<Translation> getAllWordTranslationByWordAndLang(Word word, Language lang) {
-        return translationRepository.findAllByWordAndLang(word, lang);
+        return translationRepository.findAllByWordAndWordLang(word, lang);
     }
 
     @Override

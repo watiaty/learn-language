@@ -13,7 +13,7 @@ import java.util.List;
 public interface TranslationRepository extends JpaRepository<Translation, Long> {
     List<Translation> findAllByWord(Word word);
 
-    List<Translation> findAllByWordAndLang(Word word, Language lang);
+    List<Translation> findAllByWordAndWordLang(Word word, Language lang);
 
     @Query("SELECT t FROM Translation t LEFT JOIN FETCH t.word")
     List<Translation> findAllWithWord();

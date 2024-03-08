@@ -31,23 +31,18 @@ public class WordServiceImpl implements WordService {
     }
 
     @Override
-    public Optional<Word> findWordByName(String name) {
-        return wordRepository.findByWord(name);
+    public Optional<Word> findWordByNameAndLang(String name, Language language) {
+        return wordRepository.findByWordAndLang(name, language);
     }
 
     @Override
     public Word findOrCreateWord(String name, Language lang, String transcription) {
-        Optional<Word> existingWordOptional = findWordByName(name);
+        Optional<Word> existingWordOptional = wordRepository.findFirstByWordAndLang(name, lang);
         return existingWordOptional.orElseGet(() -> wordRepository.save(Word.builder()
                 .word(name)
                 .lang(lang)
                 .transcription(transcription)
                 .build()));
-    }
-
-    @Override
-    public Word getWordByWordAndLang(String word, Language lang) {
-        return wordRepository.findFirstByWordAndLang(word, lang);
     }
 
     @Override

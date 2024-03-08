@@ -33,15 +33,8 @@ public class Translation {
     private Word word;
 
     @ManyToOne
-    @JoinColumn(name = "id_user", nullable = false)
-    @JsonIgnore
-    private User user;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "lang")
-    private Language lang;
-
-    private String translation;
+    @JoinColumn(name = "translation", nullable = false)
+    private Word translation;
     private Long numberOfUses;
     @Column(name = "is_approved")
     private boolean isApproved;
@@ -52,9 +45,7 @@ public class Translation {
     public String toString() {
         return "Translation{" +
                 "id=" + id +
-                ", user=" + user +
-                ", lang=" + lang +
-                ", translation='" + translation + '\'' +
+                ", translation='" + translation.getWord() + '\'' +
                 ", numberOfUses=" + numberOfUses +
                 ", isApproved=" + isApproved +
                 ", isPrivate=" + isPrivate +

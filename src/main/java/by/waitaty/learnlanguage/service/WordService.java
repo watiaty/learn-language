@@ -13,9 +13,7 @@ public interface WordService {
 
     Word addWord(Word word);
 
-    Word getWordByWordAndLang(String word, Language lang);
-
-    Optional<Word> findWordByName(String name);
+    Optional<Word> findWordByNameAndLang(String name, Language lang);
 
     Word findWordById(Long id);
 

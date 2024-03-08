@@ -20,7 +20,7 @@ public class Mapper {
                 .id(userWord.getId())
                 .word(userWord.getWord().getWord())
                 .transcription(userWord.getWord().getTranscription())
-                .translations(userWord.getTranslations().stream().map(Translation::getTranslation).toList())
+                .translations(userWord.getTranslations().stream().map(word -> word.getTranslation().getWord()).toList())
                 .lang(userWord.getWord().getLang().getId())
                 .build();
     }
@@ -31,12 +31,12 @@ public class Mapper {
                 .word(word.getWord())
                 .hashtags(word.getHashtags())
                 .transcription(word.getTranscription())
-                .translations(word.getTranslations().stream().map(Translation::getTranslation).toList())
+                .translations(word.getTranslations().stream().map(translation -> translation.getTranslation().getWord()).toList())
                 .build();
     }
 
     public TranslationSummaryDtoResponse wordTranslationSummaryDtoResponse(Translation translation, boolean contains) {
-        return new TranslationSummaryDtoResponse(translation.getId(), translation.getTranslation(), contains);
+        return new TranslationSummaryDtoResponse(translation.getId(), translation.getTranslation().getWord(), contains);
     }
 
     public UserDtoResponse userToUserDtoResponse(User user) {

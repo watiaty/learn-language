@@ -14,9 +14,9 @@ public interface WordRepository extends JpaRepository<Word, Long> {
 
     List<Word> findAllByLang(Language lang);
 
-    Word findFirstByWordAndLang(String word, Language lang);
+    Optional<Word> findFirstByWordAndLang(String word, Language lang);
 
-    Optional<Word> findByWord(String name);
+    Optional<Word> findByWordAndLang(String name, Language language);
 
     @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, attributePaths = {"hashtags", "translations"})
     List<Word> findAllByWordStartingWith(String searchText);

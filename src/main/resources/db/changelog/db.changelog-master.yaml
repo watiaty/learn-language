@@ -30,3 +30,7 @@ databaseChangeLog:
       file: db/changelog/changeset/remove-is_learning-column.yaml
   - include:
       file: db/changelog/changeset/change-repeat_date-column-type.yaml
+  - include:
+      file: db/changelog/changeset/change-translation-table.yaml
+  - include:
+      file: db/changelog/changeset/remove-lang-column-translation.yaml
