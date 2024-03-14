@@ -241,7 +241,7 @@ public class WordController {
                     Translation.builder()
                             .translation(wordService.addWord(translationWord))
                             .word(word)
-                            .numberOfUses(0L)
+                            .numberOfUses(1L)
                             .build()
             );
             userWord.addTranslation(newTranslated);
