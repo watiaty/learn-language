@@ -39,7 +39,7 @@ public interface UserWordRepository extends JpaRepository<UserWord, Long> {
             """)
     List<UserWord> findAllByUserAndWordLangOrderByRepeatStageDescRepeatDateAsc(User user, Language language, Pageable pageable);
 
-    Optional<UserWord> findUserWordByWordAndUser(Word word, User user);
+    Optional<UserWord> findByWordAndUser(Word word, User user);
 
     Optional<UserWord> findUSerWordByTranslationsContainsAndUser(Translation translation, User user);
 }

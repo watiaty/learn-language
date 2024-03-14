@@ -31,7 +31,7 @@ public class UserWordServiceImpl implements UserWordService {
     }
 
     public Optional<UserWord> getUserWordByWord(Word word, User user) {
-        return userWordRepository.findUserWordByWordAndUser(word, user);
+        return userWordRepository.findByWordAndUser(word, user);
     }
 
     public UserWord update(UserWord userWord) {

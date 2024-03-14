@@ -193,17 +193,8 @@ public class WordController {
     public void newTranslationToUser(@RequestBody AddNewTranslationRequest request, Principal principal) {
         User user = userService.findByUsername(principal.getName()).orElseThrow();
         Word word = wordService.findWordById(request.getId());
-        Word translationWord = Word.builder()
-                .word(request.getTranslation())
-                .lang(user.getNativeLang())
-                .build();
-        Translation translation = wordTranslationService.addWordTranslation(
-                Translation.builder()
-                        .word(word)
-                        .translation(wordService.addWord(translationWord))
-                        .numberOfUses(0L)
-                        .build()
-        );
+        Word translationWord = wordService.findOrCreateWord(request.getTranslation(), user.getNativeLang(), "");
+        Translation translation = wordTranslationService.addWordTranslation(translationWord, word);
 
         UserWord userWord = userWordService.getUserWordByWord(word, user)
                 .orElseGet(() -> UserWord.builder()
@@ -229,21 +220,16 @@ public class WordController {
     }
 
     private UserWord createUserWord(User user, Word word, List<String> translations) {
-        UserWord userWord = UserWord.builder()
-                .user(user)
-                .word(word)
-                .repeatStage(1)
-                .repeatDate(LocalDate.now())
-                .build();
+        UserWord userWord = userWordService.getUserWordByWord(word, user)
+                .orElseGet(() -> UserWord.builder()
+                        .user(user)
+                        .word(word)
+                        .repeatStage(1)
+                        .repeatDate(LocalDate.now())
+                        .build());
         translations.forEach(translation -> {
             Word translationWord = wordService.findOrCreateWord(translation, user.getNativeLang(), "");
-            Translation newTranslated = wordTranslationService.addWordTranslation(
-                    Translation.builder()
-                            .translation(wordService.addWord(translationWord))
-                            .word(word)
-                            .numberOfUses(1L)
-                            .build()
-            );
+            Translation newTranslated = wordTranslationService.addWordTranslation(translationWord, word);
             userWord.addTranslation(newTranslated);
         });
         return userWord;
