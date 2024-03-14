@@ -1,14 +1,10 @@
 package by.waitaty.learnlanguage.service.impl;
 
-import by.waitaty.learnlanguage.entity.Language;
-import by.waitaty.learnlanguage.entity.Word;
 import by.waitaty.learnlanguage.entity.Translation;
 import by.waitaty.learnlanguage.repository.TranslationRepository;
 import by.waitaty.learnlanguage.service.TranslationService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -27,18 +23,9 @@ public class TranslationServiceImpl implements TranslationService {
     }
 
     @Override
-    public List<Translation> getAllWordTranslationByWordAndLang(Word word, Language lang) {
-        return translationRepository.findAllByWordAndWordLang(word, lang);
-    }
-
-    @Override
-    public List<Translation> findAll() {
-        return translationRepository.findAllWithWord();
-    }
-
-    @Override
-    public List<Translation> getAllByWord(Word word) {
-        return translationRepository.findAllByWord(word);
+    public void decNumberOfUses(Translation translation) {
+        translation.setNumberOfUses(translation.getNumberOfUses() - 1);
+        translationRepository.save(translation);
     }
 
     @Override

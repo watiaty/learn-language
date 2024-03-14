@@ -20,11 +20,6 @@ import java.util.Optional;
 public class UserWordServiceImpl implements UserWordService {
     private final UserWordRepository userWordRepository;
 
-    @Override
-    public void addUserWord(UserWord userWord) {
-        userWordRepository.save(userWord);
-    }
-
     public List<UserWord> getAllByWord(User user) {
         return userWordRepository.findAllByUserOrderByIdAsc(user);
     }

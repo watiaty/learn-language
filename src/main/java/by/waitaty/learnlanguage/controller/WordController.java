@@ -150,6 +150,7 @@ public class WordController {
                         .build());
 
         userWord.addTranslation(translation);
+        wordTranslationService.incNumberOfUses(translation);
         userWordService.update(userWord);
     }
 
@@ -159,10 +160,15 @@ public class WordController {
     public void deleteTranslationToUser(@RequestBody Long id, Principal principal) {
         User user = userService.findByUsername(principal.getName()).orElseThrow();
         Translation translation = wordTranslationService.findById(id);
+        wordTranslationService.decNumberOfUses(translation);
 
         userWordService.getUserWordByTranslationAndUser(translation, user).ifPresent(userWord -> {
             userWord.deleteTranslation(translation);
-            userWordService.update(userWord);
+            if (userWord.getTranslations().isEmpty()) {
+                userWordService.delete(userWord.getId());
+            } else {
+                userWordService.update(userWord);
+            }
         });
     }
 
@@ -230,10 +236,7 @@ public class WordController {
                 .repeatDate(LocalDate.now())
                 .build();
         translations.forEach(translation -> {
-            Word translationWord = Word.builder()
-                    .word(translation)
-                    .lang(user.getNativeLang())
-                    .build();
+            Word translationWord = wordService.findOrCreateWord(translation, user.getNativeLang(), "");
             Translation newTranslated = wordTranslationService.addWordTranslation(
                     Translation.builder()
                             .translation(wordService.addWord(translationWord))

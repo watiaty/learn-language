@@ -16,11 +16,6 @@ public class WordServiceImpl implements WordService {
     private final WordRepository wordRepository;
 
     @Override
-    public List<Word> findAllByLang(Language lang) {
-        return wordRepository.findAllByLang(lang);
-    }
-
-    @Override
     public List<Word> findAll() {
         return wordRepository.findAll();
     }

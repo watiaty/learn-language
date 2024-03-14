@@ -31,19 +31,15 @@ public interface UserWordRepository extends JpaRepository<UserWord, Long> {
             WHERE uw.user = :user\s
             AND uw.word.lang = :language\s
             AND (
-                (uw.repeatStage = 1 AND uw.repeatDate != CURRENT_DATE())
-                OR (uw.repeatStage = 2 AND uw.repeatDate < DATEADD(DAY, -7, CURRENT_DATE()))
-                OR (uw.repeatStage = 3 AND uw.repeatDate < DATEADD(DAY, -30, CURRENT_DATE()))
+                (uw.repeatStage = 1)
+                OR (uw.repeatStage = 2 AND uw.repeatDate < DATEADD(DAY, -1, CURRENT_DATE()))
+                OR (uw.repeatStage = 3 AND uw.repeatDate < DATEADD(DAY, -3, CURRENT_DATE()))
             )
             ORDER BY uw.repeatStage DESC, uw.repeatDate ASC
             """)
     List<UserWord> findAllByUserAndWordLangOrderByRepeatStageDescRepeatDateAsc(User user, Language language, Pageable pageable);
 
     Optional<UserWord> findUserWordByWordAndUser(Word word, User user);
-
-    @Modifying
-    @Query(value = "DELETE FROM user_translation WHERE id_translation = :translationId AND id_user = :userId", nativeQuery = true)
-    void deleteTranslationByTranslationAndUser(@Param("translationId") Long wordId, @Param("userId") Long userId);
 
     Optional<UserWord> findUSerWordByTranslationsContainsAndUser(Translation translation, User user);
 }

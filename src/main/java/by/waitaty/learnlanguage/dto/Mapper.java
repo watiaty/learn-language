@@ -36,7 +36,7 @@ public class Mapper {
     }
 
     public TranslationSummaryDtoResponse wordTranslationSummaryDtoResponse(Translation translation, boolean contains) {
-        return new TranslationSummaryDtoResponse(translation.getId(), translation.getTranslation().getWord(), contains);
+        return new TranslationSummaryDtoResponse(translation.getId(), translation.getTranslation().getWord(), contains, translation.getNumberOfUses());
     }
 
     public UserDtoResponse userToUserDtoResponse(User user) {
@@ -52,8 +52,4 @@ public class Mapper {
                 .role(user.getRole())
                 .build();
     }
-
-//    public User toUser(UserCreationDTO userDTO) {
-//        return new User(userDTO.getName(), userDTO.getPassword(), new ArrayList<>());
-//    }
 }

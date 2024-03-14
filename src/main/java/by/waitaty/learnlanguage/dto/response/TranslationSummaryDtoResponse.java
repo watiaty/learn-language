@@ -9,4 +9,5 @@ public class TranslationSummaryDtoResponse {
     private Long id;
     private String translation;
     private boolean isUser;
+    private Long quantity;
 }
