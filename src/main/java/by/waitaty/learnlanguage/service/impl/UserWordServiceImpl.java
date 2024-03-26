@@ -4,7 +4,6 @@ import by.waitaty.learnlanguage.entity.Language;
 import by.waitaty.learnlanguage.entity.Translation;
 import by.waitaty.learnlanguage.entity.User;
 import by.waitaty.learnlanguage.entity.UserWord;
-import by.waitaty.learnlanguage.entity.Word;
 import by.waitaty.learnlanguage.repository.UserWordRepository;
 import by.waitaty.learnlanguage.service.UserWordService;
 import lombok.RequiredArgsConstructor;
@@ -27,11 +26,11 @@ public class UserWordServiceImpl implements UserWordService {
     public List<UserWord> getCountLearningWords(int count, Language language, User user) {
         if (count == 0) count = Integer.MAX_VALUE;
         Pageable pageable = PageRequest.of(0, count);
-        return userWordRepository.findAllByUserAndWordLangOrderByRepeatStageDescRepeatDateAsc(user, language, pageable);
+        return userWordRepository.findAllByUserOrderByRepeatStageDescRepeatDateAsc(user, pageable);
     }
 
-    public Optional<UserWord> getUserWordByWord(Word word, User user) {
-        return userWordRepository.findByWordAndUser(word, user);
+    public Optional<UserWord> getUserWordByWord(Long id, User user) {
+        return userWordRepository.findByIdWordAndUser(id, user);
     }
 
     public UserWord update(UserWord userWord) {

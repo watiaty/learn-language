@@ -1,10 +1,8 @@
 package by.waitaty.learnlanguage.repository;
 
-import by.waitaty.learnlanguage.entity.Language;
 import by.waitaty.learnlanguage.entity.Translation;
 import by.waitaty.learnlanguage.entity.User;
 import by.waitaty.learnlanguage.entity.UserWord;
-import by.waitaty.learnlanguage.entity.Word;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,14 +20,13 @@ public interface UserWordRepository extends JpaRepository<UserWord, Long> {
     @Query(value = "insert into user_word (id_word, id_user) VALUES (:wordId, :userId)", nativeQuery = true)
     void add(@Param("wordId") Long wordId, @Param("userId") Long userId);
 
-    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, attributePaths = {"word", "translations"})
+    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, attributePaths = {"translations"})
     List<UserWord> findAllByUserOrderByIdAsc(User user);
 
     @EntityGraph(type = EntityGraph.EntityGraphType.FETCH, attributePaths = {"word", "translations"})
     @Query("""
             SELECT uw FROM UserWord uw
             WHERE uw.user = :user\s
-            AND uw.word.lang = :language\s
             AND (
                 (uw.repeatStage = 1)
                 OR (uw.repeatStage = 2 AND uw.repeatDate < DATEADD(DAY, -1, CURRENT_DATE()))
@@ -37,9 +34,9 @@ public interface UserWordRepository extends JpaRepository<UserWord, Long> {
             )
             ORDER BY uw.repeatStage DESC, uw.repeatDate ASC
             """)
-    List<UserWord> findAllByUserAndWordLangOrderByRepeatStageDescRepeatDateAsc(User user, Language language, Pageable pageable);
+    List<UserWord> findAllByUserOrderByRepeatStageDescRepeatDateAsc(User user, Pageable pageable);
 
-    Optional<UserWord> findByWordAndUser(Word word, User user);
+    Optional<UserWord> findByIdWordAndUser(Long word, User user);
 
     Optional<UserWord> findUSerWordByTranslationsContainsAndUser(Translation translation, User user);
 }

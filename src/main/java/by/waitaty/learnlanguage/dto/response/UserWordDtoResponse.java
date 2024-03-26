@@ -14,5 +14,5 @@ public class UserWordDtoResponse {
     private String word;
     private String lang;
     private String transcription;
-    private List<String> translations;
+    private List<Long> translations;
 }

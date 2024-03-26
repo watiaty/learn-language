@@ -1,23 +1,21 @@
 package by.waitaty.learnlanguage.controller;
 
+import by.waitaty.learnlanguage.client.WordClient;
 import by.waitaty.learnlanguage.dto.Mapper;
 import by.waitaty.learnlanguage.dto.request.AddNewTranslationRequest;
 import by.waitaty.learnlanguage.dto.request.AddWordRequest;
 import by.waitaty.learnlanguage.dto.request.WordTrainDtoRequest;
 import by.waitaty.learnlanguage.dto.response.TranslationSummaryDtoResponse;
 import by.waitaty.learnlanguage.dto.response.UserWordDtoResponse;
-import by.waitaty.learnlanguage.dto.response.WordDtoResponse;
 import by.waitaty.learnlanguage.dto.response.WordInfoDtoResponse;
 import by.waitaty.learnlanguage.entity.Language;
 import by.waitaty.learnlanguage.entity.Translation;
 import by.waitaty.learnlanguage.entity.User;
 import by.waitaty.learnlanguage.entity.UserWord;
 import by.waitaty.learnlanguage.entity.Word;
-import by.waitaty.learnlanguage.exception.WordNotFoundException;
 import by.waitaty.learnlanguage.service.impl.TranslationServiceImpl;
 import by.waitaty.learnlanguage.service.impl.UserServiceImpl;
 import by.waitaty.learnlanguage.service.impl.UserWordServiceImpl;
-import by.waitaty.learnlanguage.service.impl.WordServiceImpl;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -36,13 +34,13 @@ import java.util.Arrays;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/word")
+@RequestMapping("/api/v1/words")
 @AllArgsConstructor
 public class WordController {
-    private final WordServiceImpl wordService;
     private final TranslationServiceImpl wordTranslationService;
     private final UserServiceImpl userService;
     private final UserWordServiceImpl userWordService;
+    private WordClient wordClient;
     private Mapper mapper;
 
     @GetMapping(path = "/my")
@@ -70,13 +68,6 @@ public class WordController {
                 .toList();
     }
 
-    @GetMapping(path = "all")
-    public List<WordDtoResponse> getAll() {
-        return wordService.findAll().stream()
-                .map(mapper::wordToWordDtoResponse)
-                .toList();
-    }
-
     @PostMapping("/update/learned")
     public void setLearnedStatusWord(@RequestBody Long id) {
         userWordService.findById(id).ifPresent(userWord -> {
@@ -99,25 +90,11 @@ public class WordController {
         });
     }
 
-    @GetMapping("/search")
-    public List<WordInfoDtoResponse> search(@RequestParam("word") String searchText) {
-        return wordService.searchWords(searchText).stream()
-                .map(word -> WordInfoDtoResponse.builder()
-                        .id(word.getId().toString())
-                        .word(word.getWord())
-                        .translations(word.getTranslations().stream()
-                                .map(translation -> mapper.wordTranslationSummaryDtoResponse(translation, false))
-                                .toList())
-                        .transcription(word.getTranscription())
-                        .language(word.getLang().getId())
-                        .build())
-                .toList();
-    }
-
     @GetMapping
     @SecurityRequirement(name = "JWT")
     public WordInfoDtoResponse getWord(@RequestParam("word") String name, @RequestParam("lang") String lang, Principal principal) {
-        Word word = wordService.findWordByNameAndLang(name, Language.getLanguageFromString(lang.toLowerCase())).orElseThrow(() -> new WordNotFoundException(name));
+        Word word = wordClient.findByWordAndLang(name, lang);
+
         User user = userService.findByUsername(principal.getName()).orElseThrow();
         List<TranslationSummaryDtoResponse> translationSummaryDtoResponses = word.getTranslations().stream()
                 .map(translation -> {
@@ -130,7 +107,6 @@ public class WordController {
                 .id(word.getId().toString())
                 .word(word.getWord())
                 .translations(translationSummaryDtoResponses)
-                .transcription(word.getTranscription())
                 .language(word.getLang().getId())
                 .build();
     }
@@ -141,9 +117,9 @@ public class WordController {
     public void addTranslationToUser(@RequestBody Long id, Principal principal) {
         User user = userService.findByUsername(principal.getName()).orElseThrow();
         Translation translation = wordTranslationService.findById(id);
-        UserWord userWord = userWordService.getUserWordByWord(translation.getWord(), user)
+        UserWord userWord = userWordService.getUserWordByWord(translation.getIdTranslationWord(), user)
                 .orElse(UserWord.builder()
-                        .word(translation.getWord())
+                        .idWord(translation.getIdTranslationWord())
                         .user(user)
                         .repeatStage(1)
                         .repeatDate(LocalDate.now())
@@ -192,14 +168,14 @@ public class WordController {
     @SecurityRequirement(name = "JWT")
     public void newTranslationToUser(@RequestBody AddNewTranslationRequest request, Principal principal) {
         User user = userService.findByUsername(principal.getName()).orElseThrow();
-        Word word = wordService.findWordById(request.getId());
-        Word translationWord = wordService.findOrCreateWord(request.getTranslation(), user.getNativeLang(), "");
+        Word word = wordClient.findById(request.getId());
+        Word translationWord = wordClient.findOrCreate(request.getTranslation(), user.getNativeLang().getId(), "");
         Translation translation = wordTranslationService.addWordTranslation(translationWord, word);
 
-        UserWord userWord = userWordService.getUserWordByWord(word, user)
+        UserWord userWord = userWordService.getUserWordByWord(word.getId(), user)
                 .orElseGet(() -> UserWord.builder()
                         .user(user)
-                        .word(word)
+                        .idWord(word.getId())
                         .repeatStage(1)
                         .repeatDate(LocalDate.now())
                         .build());
@@ -213,22 +189,22 @@ public class WordController {
     @Transactional
     public ResponseEntity<UserWordDtoResponse> addWord(@RequestBody AddWordRequest addWordRequest, Principal principal) {
         User user = userService.findByUsername(principal.getName()).orElseThrow();
-        Word word = wordService.findOrCreateWord(addWordRequest.getWord(), Language.getLanguageFromString(addWordRequest.getLang()), addWordRequest.getTranscription());
+        Word word = wordClient.findOrCreate(addWordRequest.getWord(), addWordRequest.getLang(), addWordRequest.getTranscription());
         UserWord userWord = createUserWord(user, word, Arrays.stream(addWordRequest.getTranslations()).toList());
         UserWord savedUserWord = userWordService.update(userWord);
         return ResponseEntity.ok(mapper.userWordToWordDtoResponse(savedUserWord));
     }
 
     private UserWord createUserWord(User user, Word word, List<String> translations) {
-        UserWord userWord = userWordService.getUserWordByWord(word, user)
+        UserWord userWord = userWordService.getUserWordByWord(word.getId(), user)
                 .orElseGet(() -> UserWord.builder()
                         .user(user)
-                        .word(word)
+                        .idWord(word.getId())
                         .repeatStage(1)
                         .repeatDate(LocalDate.now())
                         .build());
         translations.forEach(translation -> {
-            Word translationWord = wordService.findOrCreateWord(translation, user.getNativeLang(), "");
+            Word translationWord = wordClient.findOrCreate(translation, user.getNativeLang().getId(), "");
             Translation newTranslated = wordTranslationService.addWordTranslation(translationWord, word);
             userWord.addTranslation(newTranslated);
         });

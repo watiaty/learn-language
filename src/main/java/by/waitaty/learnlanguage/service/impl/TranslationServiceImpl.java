@@ -14,10 +14,10 @@ public class TranslationServiceImpl implements TranslationService {
 
     @Override
     public Translation addWordTranslation(Word translation, Word word) {
-        return translationRepository.findByTranslationAndWord(translation, word).orElseGet(() ->
+        return translationRepository.findByIdTranslationWordAndIdWord(translation.getId(), word.getId()).orElseGet(() ->
                 translationRepository.save(Translation.builder()
-                        .translation(translation)
-                        .word(word)
+//                        .translation(translation)
+                        .idWord(word.getId())
                         .numberOfUses(1L)
                         .build()));
     }

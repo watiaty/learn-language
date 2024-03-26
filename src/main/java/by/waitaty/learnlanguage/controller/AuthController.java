@@ -9,7 +9,6 @@ import by.waitaty.learnlanguage.service.impl.LogoutService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -33,6 +32,7 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
+    @CrossOrigin(origins = "*")
     public ResponseEntity<AuthenticationResponse> signIn(@RequestBody AuthenticationRequest authenticationRequest) {
         return ResponseEntity.ok(authService.signIn(authenticationRequest));
     }

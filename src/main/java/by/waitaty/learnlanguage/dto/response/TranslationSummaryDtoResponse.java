@@ -7,7 +7,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class TranslationSummaryDtoResponse {
     private Long id;
-    private String translation;
+    private Long translation;
     private boolean isUser;
     private Long quantity;
 }

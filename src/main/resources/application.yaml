@@ -1,7 +1,10 @@
 spring:
+  application:
+    name: main-service
   config:
     activate:
       on-profile: dev
+    import: "configserver:http://localhost:8088"
   datasource:
     url: jdbc:postgresql://localhost:5432/learn-language
     username: postgres
@@ -19,21 +22,20 @@ spring:
 ---
 
 spring:
+  application:
+    name: main-service
   config:
     activate:
       on-profile: production
   datasource:
-    url: ${JDBC_DATABASE_URL}
-    username: postgres
-    password: root
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     properties:
       hibernate:
         generate-ddl: false
-        ddl-auto: false
-    hibernate:
-      ddl-auto: validate
     show-sql: true
 
 ---

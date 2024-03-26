@@ -34,3 +34,5 @@ databaseChangeLog:
       file: db/changelog/changeset/change-translation-table.yaml
   - include:
       file: db/changelog/changeset/remove-lang-column-translation.yaml
+  - include:
+      file: db/changelog/changeset/drop-tables-with-hashtags.yaml

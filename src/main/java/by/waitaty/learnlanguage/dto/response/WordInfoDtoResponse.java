@@ -12,7 +12,6 @@ import java.util.List;
 public class WordInfoDtoResponse {
     private String id;
     private String word;
-    private String transcription;
     private String language;
     private List<TranslationSummaryDtoResponse> translations;
 }

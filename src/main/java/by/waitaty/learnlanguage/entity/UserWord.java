@@ -37,9 +37,7 @@ public class UserWord {
     @JsonIgnore
     private User user;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_word", nullable = false)
-    private Word word;
+    private Long idWord;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinTable(
